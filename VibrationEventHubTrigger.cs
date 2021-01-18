@@ -61,7 +61,7 @@ namespace Company.Function
         public string deviceId { get; set; }
         public string schema { get; set; }
         public string templateId { get; set; }
-        public DateTime enqueuedTime { get; set; }
+        public string enqueuedTime { get; set; }
         public List<Property> properties { get; set; }
         public Enrichments enrichments { get; set; }
     }
@@ -74,7 +74,7 @@ namespace Company.Function
         public string deviceId { get; set; }
         public string schema { get; set; }
         public string templateId { get; set; }
-        public DateTime enqueuedTime { get; set; }
+        public string enqueuedTime { get; set; }
         public List<Property> properties { get; set; }
         public Enrichments enrichments { get; set; }
     }
