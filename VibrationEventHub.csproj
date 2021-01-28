@@ -4,9 +4,58 @@
     <AzureFunctionsVersion>v3</AzureFunctionsVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventHubs" Version="4.1.1"/>
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.11"/>
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.2"/>
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventHubs" Version="4.2.0" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator" Version="1.2.1" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.11" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\VibrationEventHub.SourceManifest.xml" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\VibrationEventHub.Parameters.xml" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\VibrationEventHub.Parameters.xml" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\runtimes\win-arm64\native\sni.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\runtimes\win-x86\native\sni.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\runtimes\win-x64\native\sni.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\function.deps.json" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\VibrationEventHub.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\VibrationEventHub.pdb" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\VibrationEventHubTrigger\function.json" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\VibrationEventHub.SourceManifest.xml" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\VibrationEventHub.pdb" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\VibrationEventHub.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\VibrationEventHubTrigger\function.json" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\Microsoft.IdentityModel.JsonWebTokens.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\NCrontab.Signed.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\Microsoft.IdentityModel.Clients.ActiveDirectory.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\System.Data.SqlClient.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\Microsoft.WindowsAzure.Storage.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\runtimes\win-x86\native\sni.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\runtimes\win-x64\native\sni.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\runtimes\win-arm64\native\sni.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\function.deps.json" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\VibrationEventHub.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\VibrationEventHub.pdb" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\VibrationEventHubTrigger\function.json" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\Microsoft.IdentityModel.JsonWebTokens.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\System.Data.SqlClient.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\Microsoft.WindowsAzure.Storage.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\runtimes\win-arm64\native\sni.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\function.deps.json" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\VibrationEventHub.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\VibrationEventHub.pdb" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\runtimes\win-x86\native\sni.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\runtimes\win-x64\native\sni.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\VibrationEventHubTrigger\function.json" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\runtimes\win-x86\native\sni.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\VibrationEventHub.dll" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\VibrationEventHubTrigger\function.json" />
+    <None Remove="obj\Release\netcoreapp3.1\PubTmp\Out\bin\extensions.json" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
@@ -16,5 +65,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
 </Project>

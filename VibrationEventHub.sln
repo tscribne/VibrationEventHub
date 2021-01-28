@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.808.4
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VibrationEventHub", "VibrationEventHub.csproj", "{A3A45C7A-7D9B-4477-BDC4-55F2F1232953}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A3A45C7A-7D9B-4477-BDC4-55F2F1232953}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3A45C7A-7D9B-4477-BDC4-55F2F1232953}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3A45C7A-7D9B-4477-BDC4-55F2F1232953}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3A45C7A-7D9B-4477-BDC4-55F2F1232953}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8860F85F-6771-4094-8219-7C12F02447C2}
+	EndGlobalSection
+EndGlobal
