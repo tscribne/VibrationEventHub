@@ -26,6 +26,7 @@ namespace Company.Function
         public int rssi { get; set; } 
         public double vibration { get; set; } 
         public double wificonnecttime { get; set; } 
+        public double wififrequency_tel { get; set; }
     }
 
     public class MessageProperties    {
@@ -82,16 +83,19 @@ namespace Company.Function
             string connectionString = "Server=tcp:vibrationpoc.database.windows.net,1433;Initial Catalog=VibrationPOCServer;Persist Security Info=False;User ID=user;Password=Pass@word1;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
             SqlConnection connection;
 
+            log.LogInformation("--> VibratinEventHubTrigger");
+            
+
             try
             {
                 connection = new SqlConnection(connectionString);
 
-                log.LogInformation("CONNECTED!!!!");
+                log.LogInformation("SQL CONNECTED!!!!");
             }
 
             catch (System.Exception)
             {
-                log.LogInformation("Unable to connect to SQL database");
+                log.LogError("Unable to connect to SQL database");
                 throw;
             }
 
@@ -116,7 +120,8 @@ namespace Company.Function
                         PropertyNameCaseInsensitive = true,
                         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                     };
-                    Console.WriteLine("================================================================");
+
+                    //Console.WriteLine("================================================================");
                     
                     var jsonData = JsonSerializer.Deserialize<TelemetryRoot>(messageBody, options);
 
@@ -141,12 +146,13 @@ namespace Company.Function
                         log.LogInformation($"RSSI                 {vibration.telemetry.rssi}");
                         log.LogInformation($"Vibration            {vibration.telemetry.vibration}");
                         log.LogInformation($"WIFI Connect Time    {vibration.telemetry.wificonnecttime}");
+                        log.LogInformation($"WIFI Frequency       {vibration.telemetry.wififrequency_tel}");
                         log.LogInformation($"Msg Type             {vibration.messageProperties.type}");
                         */
                         
                         // Insert into SQL table
                         
-                        string values = $"( '{vibration.applicationId}','{vibration.messageSource}','{vibration.deviceId}','{vibration.schema}','{vibration.templateId}','{vibration.enqueuedTime}','{vibration.telemetry.azureconnecttime}','{vibration.telemetry.rssi}','{vibration.telemetry.vibration}','{vibration.telemetry.wificonnecttime}' )";
+                        string values = $"( '{vibration.applicationId}','{vibration.messageSource}','{vibration.deviceId}','{vibration.schema}','{vibration.templateId}','{vibration.enqueuedTime}','{vibration.telemetry.azureconnecttime}','{vibration.telemetry.rssi}','{vibration.telemetry.vibration}','{vibration.telemetry.wificonnecttime}','{vibration.telemetry.wififrequency_tel}')";
                         string query = "INSERT INTO dbo.Vibration " + " VALUES" + values;
 
                         SqlCommand cmd = new SqlCommand(query, connection);
@@ -178,7 +184,6 @@ namespace Company.Function
                         var prop = JsonSerializer.Deserialize<PropertyRoot>(messageBody, options);
 
                         
-                        //Console.WriteLine(messageBody);
                         /*                
                         log.LogInformation($"ApplicationID        {prop.applicationId}");
                         log.LogInformation($"Message Source       {prop.messageSource}");
@@ -196,7 +201,7 @@ namespace Company.Function
                             log.LogInformation(i.name + " " + i.value);
                         }
                         */
-                        
+
                         string values = $"('{prop.applicationId}','{prop.messageSource}','{prop.messageType}','{prop.deviceId}','{prop.schema}','{prop.templateId}','{prop.enqueuedTime}',";
 
                         foreach (var i in prop.properties)
@@ -256,10 +261,6 @@ namespace Company.Function
 
             }
 
-
-
-
-
             // Once processing of the batch is complete, if any messages in the batch failed processing throw an exception so that there is a record of the failure.
 
             if (exceptions.Count > 1)
@@ -273,128 +274,4 @@ namespace Company.Function
 
 
 }
-
-
-// Replace these two lines with your processing logic.
-//log.LogInformation(messageBody);
-
-// Strip out our JSON message 
-
-
-//Console.WriteLine(messageBody);
-
-//var options = new JsonSerializerOptions
-// {
-//     PropertyNameCaseInsensitive = true,
-//     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-//
-// };
-
-//Console.WriteLine("================================================================");
-
-//var jsonData = JsonSerializer.Deserialize<VibrationData>(messageBody, options);
-
-//if (jsonData.messageSource.Equals("telemetry"))
-// {
-
-//   var vibration = jsonData;
-
-//Console.WriteLine($"MessageBody [{messageBody}]");
-
-//Console.WriteLine($"ApplicationID        {vibration.applicationId}");
-//Console.WriteLine($"Message Source       {vibration.messageSource}");
-//Console.WriteLine($"DeviceID             {vibration.deviceId}");
-//Console.WriteLine($"Schema               {vibration.schema}");
-//Console.WriteLine($"TemplateId           {vibration.templateId}");
-//Console.WriteLine($"EnqueueTime          {vibration.enqueuedTime}");
-
-//Console.WriteLine($"AZ Connection Time   {vibration.telemetry.azureconnecttime}");
-//Console.WriteLine($"RSSI                 {vibration.telemetry.rssi}");
-//Console.WriteLine($"Vibration            {vibration.telemetry.vibration}");
-//Console.WriteLine($"WIFI Connect Time    {vibration.telemetry.wificonnecttime}");
-
-//Console.WriteLine($"Msg Type             {vibration.messageprop.messagetype}");
-
-// Insert into SQL table
-
-//string colNames = "(applicationId, messageSource, deviceId, msgschema, templateId, enqueuedTime, azureconnecttime, rssi, vibration, wificonnecttime)";
-// string values = $"( '{vibration.applicationId}','{vibration.messageSource}','{vibration.deviceId}','{vibration.schema}','{vibration.templateId}','{vibration.enqueuedTime}','{vibration.telemetry.azureconnecttime}','{vibration.telemetry.rssi}','{vibration.telemetry.vibration}','{vibration.telemetry.wificonnecttime}' )";
-// string query = "INSERT INTO dbo.Vibration " + " VALUES" + values;
-
-//SqlCommand cmd = new SqlCommand(query, connection);
-
-// try
-// {
-//     connection.Open();
-//     cmd.ExecuteNonQuery();
-//     Console.WriteLine("Telemetry Data Inserted Successfully!!!");
-// }
-// catch (SqlException e)
-// {
-//     Console.WriteLine("Error!!! Details: " + e.ToString());
-// }
-// finally
-// {
-//     connection.Close();
-// }
-//}
-
-// if (jsonData.messageSource.Equals("properties"))
-// {
-//     var prop = JsonSerializer.Deserialize<PropertyData>(messageBody, options);
-
-
-// Console.WriteLine(messageBody);
-// Console.WriteLine(prop.applicationId);
-// Console.WriteLine(prop.messageSource);
-// Console.WriteLine(prop.messageType);
-// Console.WriteLine(prop.deviceId);
-// Console.WriteLine(prop.schema);
-// Console.WriteLine(prop.templateId);
-// Console.WriteLine(prop.enqueuedTime);
-// foreach (var i in prop.properties)
-// {
-//      // In order of sleeptime, manufacturer, model, builddate, fwversion, ssid, wifi freq
-//      Console.WriteLine(i.name + " " + i.value);
-// }
-
-//string values = $"( '{vibration.applicationId}','{vibration.messageSource}','{vibration.deviceId}','{vibration.schema}','{vibration.templateId}','{vibration.enqueuedTime}','{vibration.telemetry.azureconnecttime}','{vibration.telemetry.rssi}','{vibration.telemetry.vibration}','{vibration.telemetry.wificonnecttime}' )";
-//                       string values = $"('{prop.applicationId}','{prop.messageSource}','{prop.messageType}','{prop.deviceId}','{prop.schema}','{prop.templateId}','{prop.enqueuedTime}',";
-//
-//                       foreach (var i in prop.properties)
-//                       {
-//                           if (i.name.Equals("manufacturer") ||
-//                               i.name.Equals("model") ||
-//                               i.name.Equals("builddate") ||
-//                               i.name.Equals("fwversion") ||
-//                               i.name.Equals("ssid") ||
-//                               i.name.Equals("sleeptime"))
-//                           {
-//                               values = values + $"'{i.value}',";
-//                           }//
-//
-//                            if (i.name.Equals("wififrequency"))
-//                            {
-//                                values = values + $"'{i.value}');";
-//                            }
-//                        //}
-
-
-//                        string query = "INSERT INTO dbo.Properties " + "VALUES" + values;
-//
-//                        SqlCommand cmd2 = new SqlCommand(query, connection);
-//                        try
-//                        {
-//                            connection.Open();
-//                            cmd2.ExecuteNonQuery();
-//                            Console.WriteLine("Properties Data Inserted Successfully!!!");
-//                        }
-//                        catch (SqlException e)
-//                        {
-//                            Console.WriteLine("Error!!! Details: " + e.ToString());
-//                        }
-//                        finally
-//                        {
-//                            connection.Close();
-//                        }
 
