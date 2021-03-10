@@ -96,7 +96,7 @@ namespace Company.Function
             {
                 connection = new SqlConnection(connectionString);
 
-                log.LogInformation("SQL CONNECTED!!!!");
+                //log.LogInformation("SQL CONNECTED!!!!");
             }
 
             catch (System.Exception)
@@ -117,8 +117,8 @@ namespace Company.Function
                     string messageBody = Encoding.UTF8.GetString(eventData.Body.Array, eventData.Body.Offset, eventData.Body.Count);
 
 
-                    log.LogInformation( "=====> [EVENTS]");
-                    log.LogInformation( messageBody );
+                    //log.LogInformation( "=====> [EVENTS]");
+                    //log.LogInformation( messageBody );
             
 
                     var options = new JsonSerializerOptions
@@ -127,7 +127,7 @@ namespace Company.Function
                         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                     };
 
-                    Console.WriteLine("================================================================");
+                    //Console.WriteLine("================================================================");
                     
                     var jsonData = JsonSerializer.Deserialize<TelemetryRoot>(messageBody, options);
 
@@ -142,6 +142,7 @@ namespace Company.Function
                         
                         //Console.WriteLine($"MessageBody [{messageBody}]");
 
+                        /*
                         log.LogInformation($"ApplicationID        {vibration.applicationId}");
                         log.LogInformation($"Message Source       {vibration.messageSource}");
                         log.LogInformation($"DeviceID             {vibration.deviceId}");
@@ -159,6 +160,7 @@ namespace Company.Function
                         log.LogInformation($"WIFI Freq            {vibration.telemetry.wififrequency_tel}");
                         log.LogInformation($"WIFI Connect Time    {vibration.telemetry.wificonnecttime}");
                         log.LogInformation($"Msg Type             {vibration.messageProperties.type}");
+                        */
 
                         // Insert into SQL table
                         
@@ -179,9 +181,9 @@ namespace Company.Function
                             $"'{vibration.telemetry.temperature}'," +
                             $"'{vibration.telemetry.humidity}'" +
                             $")";
-                        string query = "INSERT INTO dbo.Vibration " + " VALUES" + values;
 
-                        log.LogInformation(query);
+
+                        string query = "INSERT INTO dbo.Vibration " + " VALUES" + values;
                         SqlCommand cmd = new SqlCommand(query, connection);
 
                         try
