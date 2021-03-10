@@ -22,11 +22,17 @@ namespace Company.Function
 
     // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse); 
     public class Telemetry    {
-        public double azureconnecttime { get; set; } 
+        public double azureconnecttime { get; set; }
+        public double accelerationX { get; set; }
+        public double accelerationY { get; set;  }
+        public double acceleratinnZ { get; set; }
+        public double temperature { get; set; }
+        public double humidity { get; set; }
         public int rssi { get; set; } 
-        public double vibration { get; set; } 
-        public double wificonnecttime { get; set; } 
         public double wififrequency_tel { get; set; }
+        public double wificonnecttime { get; set; }
+        public double vibration { get; set; }
+    
     }
 
     public class MessageProperties    {
@@ -111,8 +117,8 @@ namespace Company.Function
                     string messageBody = Encoding.UTF8.GetString(eventData.Body.Array, eventData.Body.Offset, eventData.Body.Count);
 
 
-                    //log.LogInformation( "=====> [EVENTS]");
-                    //log.LogInformation( messageBody );
+                    log.LogInformation( "=====> [EVENTS]");
+                    log.LogInformation( messageBody );
             
 
                     var options = new JsonSerializerOptions
@@ -121,7 +127,7 @@ namespace Company.Function
                         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                     };
 
-                    //Console.WriteLine("================================================================");
+                    Console.WriteLine("================================================================");
                     
                     var jsonData = JsonSerializer.Deserialize<TelemetryRoot>(messageBody, options);
 
@@ -133,7 +139,7 @@ namespace Company.Function
                         
                         var vibration = jsonData;
 
-                        /*
+                        
                         //Console.WriteLine($"MessageBody [{messageBody}]");
 
                         log.LogInformation($"ApplicationID        {vibration.applicationId}");
@@ -145,16 +151,37 @@ namespace Company.Function
                         log.LogInformation($"AZ Connection Time   {vibration.telemetry.azureconnecttime}");
                         log.LogInformation($"RSSI                 {vibration.telemetry.rssi}");
                         log.LogInformation($"Vibration            {vibration.telemetry.vibration}");
+                        log.LogInformation($"Acceleration X       {vibration.telemetry.accelerationX}");
+                        log.LogInformation($"Acceleration Y       {vibration.telemetry.accelerationY}");
+                        log.LogInformation($"Acceleration Z       {vibration.telemetry.acceleratinnZ}");
+                        log.LogInformation($"Temperature          {vibration.telemetry.temperature}");
+                        log.LogInformation($"Humidity             {vibration.telemetry.humidity}");
+                        log.LogInformation($"WIFI Freq            {vibration.telemetry.wififrequency_tel}");
                         log.LogInformation($"WIFI Connect Time    {vibration.telemetry.wificonnecttime}");
-                        log.LogInformation($"WIFI Frequency       {vibration.telemetry.wififrequency_tel}");
                         log.LogInformation($"Msg Type             {vibration.messageProperties.type}");
-                        */
-                        
+
                         // Insert into SQL table
                         
-                        string values = $"( '{vibration.applicationId}','{vibration.messageSource}','{vibration.deviceId}','{vibration.schema}','{vibration.templateId}','{vibration.enqueuedTime}','{vibration.telemetry.azureconnecttime}','{vibration.telemetry.rssi}','{vibration.telemetry.vibration}','{vibration.telemetry.wificonnecttime}','{vibration.telemetry.wififrequency_tel}')";
+                        string values = $"( '{vibration.applicationId}'," +
+                            $"'{vibration.messageSource}'," +
+                            $"'{vibration.deviceId}'," +
+                            $"'{vibration.schema}'," +
+                            $"'{vibration.templateId}'," +
+                            $"'{vibration.enqueuedTime}'," +
+                            $"'{vibration.telemetry.azureconnecttime}'," +
+                            $"'{vibration.telemetry.rssi}'," +
+                            $"'{vibration.telemetry.vibration}'," +
+                            $"'{vibration.telemetry.wificonnecttime}'," +
+                            $"'{vibration.telemetry.wififrequency_tel}'," +
+                            $"'{vibration.telemetry.accelerationX}'," +
+                            $"'{vibration.telemetry.accelerationY}'," +
+                            $"'{vibration.telemetry.acceleratinnZ}'," +
+                            $"'{vibration.telemetry.temperature}'," +
+                            $"'{vibration.telemetry.humidity}'" +
+                            $")";
                         string query = "INSERT INTO dbo.Vibration " + " VALUES" + values;
 
+                        log.LogInformation(query);
                         SqlCommand cmd = new SqlCommand(query, connection);
 
                         try
