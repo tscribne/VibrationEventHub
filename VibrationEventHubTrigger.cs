@@ -21,57 +21,63 @@ namespace Company.Function
 
 
     // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse); 
-    public class Telemetry    {
+    public class Telemetry
+    {
         public double azureconnecttime { get; set; }
         public double accelerationX { get; set; }
-        public double accelerationY { get; set;  }
-        public double acceleratinnZ { get; set; }
+        public double accelerationY { get; set; }
+        public double accelerationZ { get; set; }
         public double temperature { get; set; }
         public double humidity { get; set; }
-        public int rssi { get; set; } 
+        public int rssi { get; set; }
         public double wififrequency_tel { get; set; }
         public double wificonnecttime { get; set; }
         public double vibration { get; set; }
-    
+
     }
 
-    public class MessageProperties    {
-        public string type { get; set; } 
+    public class MessageProperties
+    {
+        public string type { get; set; }
     }
 
-    public class Enrichments    {
+    public class Enrichments
+    {
     }
 
-    public class TelemetryRoot    {
-        public string applicationId { get; set; } 
-        public string messageSource { get; set; } 
-        public string deviceId { get; set; } 
-        public string schema { get; set; } 
-        public string templateId { get; set; } 
-        public DateTime enqueuedTime { get; set; } 
-        public Telemetry telemetry { get; set; } 
-        public MessageProperties messageProperties { get; set; } 
-        public Enrichments enrichments { get; set; } 
-    }
-
-    
-// Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse); 
-    public class Property    {
-        public string name { get; set; } 
-        public object value { get; set; } 
+    public class TelemetryRoot
+    {
+        public string applicationId { get; set; }
+        public string messageSource { get; set; }
+        public string deviceId { get; set; }
+        public string schema { get; set; }
+        public string templateId { get; set; }
+        public DateTime enqueuedTime { get; set; }
+        public Telemetry telemetry { get; set; }
+        public MessageProperties messageProperties { get; set; }
+        public Enrichments enrichments { get; set; }
     }
 
 
-    public class PropertyRoot    {
-        public string applicationId { get; set; } 
-        public string messageSource { get; set; } 
-        public string messageType { get; set; } 
-        public string deviceId { get; set; } 
-        public string schema { get; set; } 
-        public string templateId { get; set; } 
-        public DateTime enqueuedTime { get; set; } 
-        public List<Property> properties { get; set; } 
-        public Enrichments enrichments { get; set; } 
+    // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse); 
+    public class Property
+    {
+        public string name { get; set; }
+        public object value { get; set; }
+    }
+
+
+    public class PropertyRoot
+    {
+        public string applicationId { get; set; }
+        public string messageSource { get; set; }
+        public string messageType { get; set; }
+        public string deviceId { get; set; }
+        public string schema { get; set; }
+        public string templateId { get; set; }
+        public DateTime enqueuedTime { get; set; }
+        public List<Property> properties { get; set; }
+        public Enrichments enrichments { get; set; }
     }
 
 
@@ -90,7 +96,7 @@ namespace Company.Function
             SqlConnection connection;
 
             log.LogInformation("--> VibratinEventHubTrigger");
-            
+
 
             try
             {
@@ -119,7 +125,7 @@ namespace Company.Function
 
                     //log.LogInformation( "=====> [EVENTS]");
                     //log.LogInformation( messageBody );
-            
+
 
                     var options = new JsonSerializerOptions
                     {
@@ -128,7 +134,7 @@ namespace Company.Function
                     };
 
                     //Console.WriteLine("================================================================");
-                    
+
                     var jsonData = JsonSerializer.Deserialize<TelemetryRoot>(messageBody, options);
 
 
@@ -136,10 +142,10 @@ namespace Company.Function
                     {
                         log.LogInformation("TELEMETRY DATA");
 
-                        
+
                         var vibration = jsonData;
 
-                        
+
                         //Console.WriteLine($"MessageBody [{messageBody}]");
 
                         /*
@@ -154,16 +160,15 @@ namespace Company.Function
                         log.LogInformation($"Vibration            {vibration.telemetry.vibration}");
                         log.LogInformation($"Acceleration X       {vibration.telemetry.accelerationX}");
                         log.LogInformation($"Acceleration Y       {vibration.telemetry.accelerationY}");
-                        log.LogInformation($"Acceleration Z       {vibration.telemetry.acceleratinnZ}");
+                        log.LogInformation($"Acceleration Z       {vibration.telemetry.accelerationZ}");
                         log.LogInformation($"Temperature          {vibration.telemetry.temperature}");
                         log.LogInformation($"Humidity             {vibration.telemetry.humidity}");
                         log.LogInformation($"WIFI Freq            {vibration.telemetry.wififrequency_tel}");
                         log.LogInformation($"WIFI Connect Time    {vibration.telemetry.wificonnecttime}");
                         log.LogInformation($"Msg Type             {vibration.messageProperties.type}");
                         */
-
                         // Insert into SQL table
-                        
+
                         string values = $"( '{vibration.applicationId}'," +
                             $"'{vibration.messageSource}'," +
                             $"'{vibration.deviceId}'," +
@@ -177,7 +182,7 @@ namespace Company.Function
                             $"'{vibration.telemetry.wififrequency_tel}'," +
                             $"'{vibration.telemetry.accelerationX}'," +
                             $"'{vibration.telemetry.accelerationY}'," +
-                            $"'{vibration.telemetry.acceleratinnZ}'," +
+                            $"'{vibration.telemetry.accelerationZ}'," +
                             $"'{vibration.telemetry.temperature}'," +
                             $"'{vibration.telemetry.humidity}'" +
                             $")";
@@ -200,19 +205,19 @@ namespace Company.Function
                         {
                             connection.Close();
                         }
-                       
+
                     }
 
-                    
+
 
                     if (jsonData.messageSource.Equals("properties"))
                     {
                         log.LogInformation("PROPERTIES DATA");
 
-                        
+
                         var prop = JsonSerializer.Deserialize<PropertyRoot>(messageBody, options);
 
-                        
+
                         /*                
                         log.LogInformation($"ApplicationID        {prop.applicationId}");
                         log.LogInformation($"Message Source       {prop.messageSource}");
@@ -268,12 +273,12 @@ namespace Company.Function
                         {
                             connection.Close();
                         }
-                        
+
 
                     }
 
-                    
-                    
+
+
                     await Task.Yield();
 
                 }
