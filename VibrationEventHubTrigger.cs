@@ -32,6 +32,10 @@ namespace Company.Function
         public int rssi { get; set; }
         public double wififrequency_tel { get; set; }
         public double wificonnecttime { get; set; }
+        public int wififails { get; set; }
+        public int wifiresets { get; set; }
+        public int azurefails { get; set; }
+        public int fatals { get; set; }
         public double vibration { get; set; }
 
     }
@@ -79,9 +83,6 @@ namespace Company.Function
         public List<Property> properties { get; set; }
         public Enrichments enrichments { get; set; }
     }
-
-
-
 
 
     public static class VibrationEventHubTrigger
@@ -145,10 +146,10 @@ namespace Company.Function
 
                         var vibration = jsonData;
 
-
-                        //Console.WriteLine($"MessageBody [{messageBody}]");
-
                         /*
+                        Console.WriteLine($"MessageBody [{messageBody}]");
+
+                        
                         log.LogInformation($"ApplicationID        {vibration.applicationId}");
                         log.LogInformation($"Message Source       {vibration.messageSource}");
                         log.LogInformation($"DeviceID             {vibration.deviceId}");
@@ -165,8 +166,13 @@ namespace Company.Function
                         log.LogInformation($"Humidity             {vibration.telemetry.humidity}");
                         log.LogInformation($"WIFI Freq            {vibration.telemetry.wififrequency_tel}");
                         log.LogInformation($"WIFI Connect Time    {vibration.telemetry.wificonnecttime}");
+                        log.LogInformation($"WIFI Fails           {vibration.telemetry.wififails}");
+                        log.LogInformation($"WIFI Resets          {vibration.telemetry.wifiresets}");
+                        log.LogInformation($"Azure Fails          {vibration.telemetry.azurefails}");
+                        log.LogInformation($"Fatals               {vibration.telemetry.fatals}");
                         log.LogInformation($"Msg Type             {vibration.messageProperties.type}");
                         */
+
                         // Insert into SQL table
 
                         string values = $"( '{vibration.applicationId}'," +
@@ -184,7 +190,11 @@ namespace Company.Function
                             $"'{vibration.telemetry.accelerationY}'," +
                             $"'{vibration.telemetry.accelerationZ}'," +
                             $"'{vibration.telemetry.temperature}'," +
-                            $"'{vibration.telemetry.humidity}'" +
+                            $"'{vibration.telemetry.humidity}'," +
+                            $"'{vibration.telemetry.wififails}'," +
+                            $"'{vibration.telemetry.wifiresets}'," +
+                            $"'{vibration.telemetry.azurefails}'," +
+                            $"'{vibration.telemetry.fatals}'" +
                             $")";
 
 
@@ -217,6 +227,7 @@ namespace Company.Function
 
                         var prop = JsonSerializer.Deserialize<PropertyRoot>(messageBody, options);
 
+                        //Console.WriteLine($"*** Properties *** MessageBody [{messageBody}]");
 
                         /*                
                         log.LogInformation($"ApplicationID        {prop.applicationId}");
@@ -226,9 +237,10 @@ namespace Company.Function
                         log.LogInformation($"Schema               {prop.schema}");
                         log.LogInformation($"TemplateID           {prop.templateId}");
                         log.LogInformation($"EnqueuedTime         {prop.enqueuedTime}");
+                        */
 
 
-                        
+                        /*                        
                         foreach (var i in prop.properties)
                         {
                             // In order of sleeptime, manufacturer, model, builddate, fwversion, ssid, wifi freq
@@ -236,26 +248,56 @@ namespace Company.Function
                         }
                         */
 
+
+                        
                         string values = $"('{prop.applicationId}','{prop.messageSource}','{prop.messageType}','{prop.deviceId}','{prop.schema}','{prop.templateId}','{prop.enqueuedTime}',";
+
+                        //
+                        // This is all added due to the two different properties code that
+                        // Brady put it, some of the devices have the old code with does not
+                        // include the two conntime variables.  We need to add two additional
+                        // columns so that SQL will be happy when we add the row.  We can remove
+                        // all of the if String.Compare's once all the devices are updated.
+                        //
+
+                        Property last = prop.properties.Last();
+                        //log.LogInformation($"Last is '{last.name}'");
 
                         foreach (var i in prop.properties)
                         {
-                            if (i.name.Equals("manufacturer") ||
-                                i.name.Equals("model") ||
-                                i.name.Equals("builddate") ||
-                                i.name.Equals("fwversion") ||
-                                i.name.Equals("ssid") ||
-                                i.name.Equals("sleeptime"))
-                            {
-                                values = values + $"'{i.value}',";
-                            }
+                            String s1 = $"'{last.name}'";
+                            String s2 = $"'{i.name}'";
 
-                            if (i.name.Equals("wififrequency"))
+                            //log.LogInformation($"Comparing " + s1 + "==" + s2);
+
+                            if( String.Compare(s1,s2) == 0 )
                             {
-                                values = values + $"'{i.value}');";
+                                //log.LogInformation($"Ending '{i.name}'");
+                                values += $"'{i.value}'";
+
+                                //log.LogInformation($"Comparing {i.name} to wififrequency ");
+                                
+                                if( String.Compare($"{i.name}",$"wififrequency") == 0)
+                                {
+                                    //log.LogInformation("OLD OUTPUT");
+                                    values += $",'0','0')";
+                                }
+                                else
+                                {
+                                    values += $")";
+                                }
+                            }
+                            else
+                            {
+                                //log.LogInformation($"Adding '{i.name}'");
+                                values += $"'{i.value}',";
                             }
                         }
 
+
+                        values += $";";
+
+                        //log.LogInformation($"***VALUES*** " + values);
 
                         string query = "INSERT INTO dbo.Properties " + "VALUES" + values;
                         SqlCommand cmd2 = new SqlCommand(query, connection);
@@ -274,6 +316,7 @@ namespace Company.Function
                             connection.Close();
                         }
 
+                       
 
                     }
 
