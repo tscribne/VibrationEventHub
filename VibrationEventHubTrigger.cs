@@ -38,6 +38,7 @@ namespace Company.Function
         public double vibration { get; set; }
         public double avgcurrent { get; set; }
         public double connecttime { get; set; }
+        public int appcrash { get; set; }
 
     }
 
@@ -173,7 +174,9 @@ namespace Company.Function
                         log.LogInformation($"Fatals               {vibration.telemetry.fatals}");
                         log.LogInformation($"Avg Current          {vibration.telemetry.avgcurrent}");
                         log.LogInformation($"Connect Time         {vibration.telemetry.connecttime}");
+                        log.LogInformation($"App Crashes          {vibration.telemetry.appcrash}");
                         log.LogInformation($"Msg Type             {vibration.messageProperties.type}");
+                        
 
 
                         // Insert into SQL table
@@ -199,7 +202,8 @@ namespace Company.Function
                             $"'{vibration.telemetry.azurefails}'," +
                             $"'{vibration.telemetry.fatals}'," +
                             $"'{vibration.telemetry.avgcurrent}',"+
-                            $"'{vibration.telemetry.connecttime}'"+
+                            $"'{vibration.telemetry.connecttime}',"+
+                            $"'{vibration.telemetry.appcrash}'"+
                             $")";
 
 
