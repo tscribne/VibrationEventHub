@@ -19,7 +19,6 @@ using Microsoft.Extensions.Logging;
 namespace Company.Function
 {
 
-
     // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse); 
     public class Telemetry
     {
@@ -37,6 +36,8 @@ namespace Company.Function
         public int azurefails { get; set; }
         public int fatals { get; set; }
         public double vibration { get; set; }
+        public double avgcurrent { get; set; }
+        public double connecttime { get; set; }
 
     }
 
@@ -146,10 +147,10 @@ namespace Company.Function
 
                         var vibration = jsonData;
 
-                        /*
+
                         Console.WriteLine($"MessageBody [{messageBody}]");
 
-                        
+
                         log.LogInformation($"ApplicationID        {vibration.applicationId}");
                         log.LogInformation($"Message Source       {vibration.messageSource}");
                         log.LogInformation($"DeviceID             {vibration.deviceId}");
@@ -170,8 +171,10 @@ namespace Company.Function
                         log.LogInformation($"WIFI Resets          {vibration.telemetry.wifiresets}");
                         log.LogInformation($"Azure Fails          {vibration.telemetry.azurefails}");
                         log.LogInformation($"Fatals               {vibration.telemetry.fatals}");
+                        log.LogInformation($"Avg Current          {vibration.telemetry.avgcurrent}");
+                        log.LogInformation($"Connect Time         {vibration.telemetry.connecttime}");
                         log.LogInformation($"Msg Type             {vibration.messageProperties.type}");
-                        */
+
 
                         // Insert into SQL table
 
@@ -194,7 +197,9 @@ namespace Company.Function
                             $"'{vibration.telemetry.wififails}'," +
                             $"'{vibration.telemetry.wifiresets}'," +
                             $"'{vibration.telemetry.azurefails}'," +
-                            $"'{vibration.telemetry.fatals}'" +
+                            $"'{vibration.telemetry.fatals}'," +
+                            $"'{vibration.telemetry.avgcurrent}',"+
+                            $"'{vibration.telemetry.connecttime}'"+
                             $")";
 
 
@@ -229,7 +234,7 @@ namespace Company.Function
 
                         //Console.WriteLine($"*** Properties *** MessageBody [{messageBody}]");
 
-                        /*                
+
                         log.LogInformation($"ApplicationID        {prop.applicationId}");
                         log.LogInformation($"Message Source       {prop.messageSource}");
                         log.LogInformation($"Message Type         {prop.messageType}");
@@ -237,19 +242,19 @@ namespace Company.Function
                         log.LogInformation($"Schema               {prop.schema}");
                         log.LogInformation($"TemplateID           {prop.templateId}");
                         log.LogInformation($"EnqueuedTime         {prop.enqueuedTime}");
-                        */
 
 
-                        /*                        
+
+
                         foreach (var i in prop.properties)
                         {
                             // In order of sleeptime, manufacturer, model, builddate, fwversion, ssid, wifi freq
                             log.LogInformation(i.name + " " + i.value);
                         }
-                        */
 
 
-                        
+
+
                         string values = $"('{prop.applicationId}','{prop.messageSource}','{prop.messageType}','{prop.deviceId}','{prop.schema}','{prop.templateId}','{prop.enqueuedTime}',";
 
                         //
@@ -270,14 +275,14 @@ namespace Company.Function
 
                             //log.LogInformation($"Comparing " + s1 + "==" + s2);
 
-                            if( String.Compare(s1,s2) == 0 )
+                            if (String.Compare(s1, s2) == 0)
                             {
                                 //log.LogInformation($"Ending '{i.name}'");
                                 values += $"'{i.value}'";
 
                                 //log.LogInformation($"Comparing {i.name} to wififrequency ");
-                                
-                                if( String.Compare($"{i.name}",$"wififrequency") == 0)
+
+                                if (String.Compare($"{i.name}", $"wififrequency") == 0)
                                 {
                                     //log.LogInformation("OLD OUTPUT");
                                     values += $",'0','0')";
@@ -316,7 +321,7 @@ namespace Company.Function
                             connection.Close();
                         }
 
-                       
+
 
                     }
 
