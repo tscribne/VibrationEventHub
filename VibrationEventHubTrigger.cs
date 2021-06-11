@@ -86,6 +86,18 @@ namespace Company.Function
         public Enrichments enrichments { get; set; }
     }
 
+    public class PropertyTypes
+    {
+        public int sleeptime { get; set; }
+        public string manufacturer { get; set; }
+        public string model { get; set; }
+        public string builddate { get; set; }
+        public string fwversion { get; set; }
+        public string ssid { get; set; }
+        public int wififrequency { get; set; }
+        public int conntimemax { get; set; }
+        public int wifitimemax { get; set; }
+    }
 
     public static class VibrationEventHubTrigger
     {
@@ -100,11 +112,9 @@ namespace Company.Function
 
             log.LogInformation("--> VibratinEventHubTrigger");
 
-
             try
             {
                 connection = new SqlConnection(connectionString);
-
                 //log.LogInformation("SQL CONNECTED!!!!");
             }
 
@@ -121,14 +131,10 @@ namespace Company.Function
 
                 try
                 {
-
-
                     string messageBody = Encoding.UTF8.GetString(eventData.Body.Array, eventData.Body.Offset, eventData.Body.Count);
-
 
                     //log.LogInformation( "=====> [EVENTS]");
                     //log.LogInformation( messageBody );
-
 
                     var options = new JsonSerializerOptions
                     {
@@ -140,18 +146,20 @@ namespace Company.Function
 
                     var jsonData = JsonSerializer.Deserialize<TelemetryRoot>(messageBody, options);
 
-
                     if (jsonData.messageSource.Equals("telemetry"))
                     {
                         log.LogInformation("TELEMETRY DATA");
 
-
                         var vibration = jsonData;
 
+                        /*
+                         * 
+                         * 
+                         */
 
-                        Console.WriteLine($"MessageBody [{messageBody}]");
+                        //Console.WriteLine($"*** TELEMETRY ***  [{messageBody}]");
 
-
+                        /*
                         log.LogInformation($"ApplicationID        {vibration.applicationId}");
                         log.LogInformation($"Message Source       {vibration.messageSource}");
                         log.LogInformation($"DeviceID             {vibration.deviceId}");
@@ -178,6 +186,8 @@ namespace Company.Function
                         log.LogInformation($"Msg Type             {vibration.messageProperties.type}");
                         
 
+                        *
+                        */
 
                         // Insert into SQL table
 
@@ -201,9 +211,9 @@ namespace Company.Function
                             $"'{vibration.telemetry.wifiresets}'," +
                             $"'{vibration.telemetry.azurefails}'," +
                             $"'{vibration.telemetry.fatals}'," +
-                            $"'{vibration.telemetry.avgcurrent}',"+
-                            $"'{vibration.telemetry.connecttime}',"+
-                            $"'{vibration.telemetry.appcrash}'"+
+                            $"'{vibration.telemetry.avgcurrent}'," +
+                            $"'{vibration.telemetry.connecttime}'," +
+                            $"'{vibration.telemetry.appcrash}'" +
                             $")";
 
 
@@ -225,6 +235,42 @@ namespace Company.Function
                             connection.Close();
                         }
 
+                        /*
+                        ** Update Device Table
+                        */
+
+                        string deviceValues = $"('{vibration.deviceId}','','','0','0','{vibration.enqueuedTime}','','','','')";
+
+                        string deviceQuery = $"IF EXISTS " +
+                            "(SELECT deviceId from dbo.Device WHERE deviceId = '" + vibration.deviceId + "') " +
+                            "UPDATE dbo.device SET deviceId = '" + vibration.deviceId + "', lastTime = '" + vibration.enqueuedTime + "' " +
+                            "WHERE deviceId = '" + vibration.deviceId + "' " +
+                            "ELSE INSERT INTO dbo.Device VALUES " + deviceValues;
+
+
+                        SqlCommand deviceCmd = new SqlCommand(deviceQuery, connection);
+
+                        //log.LogInformation("==================\n" + deviceQuery + "\n=======================\n\n");
+
+                        try
+                        {
+                            connection.Open();
+                            int result = deviceCmd.ExecuteNonQuery();
+
+                            log.LogInformation("SUCCESS!!! Device Data Inserted Successfully!!! " + result + " Row ");
+
+                        }
+                        catch (SqlException e)
+                        {
+                            log.LogError("***** FAILURE ***** \nError!!! Details: " + e.ToString());
+                        }
+                        finally
+                        {
+                            connection.Close();
+                        }
+
+
+
                     }
 
 
@@ -236,9 +282,9 @@ namespace Company.Function
 
                         var prop = JsonSerializer.Deserialize<PropertyRoot>(messageBody, options);
 
-                        //Console.WriteLine($"*** Properties *** MessageBody [{messageBody}]");
-
-
+                        /*****
+                        log.LogInformation($"*** Properties *** MessageBody [{messageBody}]");
+                       
                         log.LogInformation($"ApplicationID        {prop.applicationId}");
                         log.LogInformation($"Message Source       {prop.messageSource}");
                         log.LogInformation($"Message Type         {prop.messageType}");
@@ -247,18 +293,13 @@ namespace Company.Function
                         log.LogInformation($"TemplateID           {prop.templateId}");
                         log.LogInformation($"EnqueuedTime         {prop.enqueuedTime}");
 
-
-
-
                         foreach (var i in prop.properties)
                         {
                             // In order of sleeptime, manufacturer, model, builddate, fwversion, ssid, wifi freq
                             log.LogInformation(i.name + " " + i.value);
                         }
-
-
-
-
+                        *****/
+                        
                         string values = $"('{prop.applicationId}','{prop.messageSource}','{prop.messageType}','{prop.deviceId}','{prop.schema}','{prop.templateId}','{prop.enqueuedTime}',";
 
                         //
@@ -269,42 +310,63 @@ namespace Company.Function
                         // all of the if String.Compare's once all the devices are updated.
                         //
 
+
+
                         Property last = prop.properties.Last();
-                        //log.LogInformation($"Last is '{last.name}'");
+
+                        PropertyTypes pt = new PropertyTypes();
+
+                        pt.sleeptime = 0;
+                        pt.manufacturer = "";
+                        pt.model = "";
+                        pt.builddate = "";
+                        pt.fwversion = "";
+                        pt.ssid = "";
+                        pt.wififrequency = 0;
+                        pt.conntimemax = 0;
+                        pt.wifitimemax = 0;
 
                         foreach (var i in prop.properties)
                         {
-                            String s1 = $"'{last.name}'";
-                            String s2 = $"'{i.name}'";
+                             switch( i.name.ToString() ){
+                                case "sleeptime":
+                                    pt.sleeptime = Convert.ToInt32(i.value.ToString());
+                                    break;
+                                case "manufacturer":
+                                    pt.manufacturer = i.value.ToString();
+                                    break; 
+                                case "model":
+                                    pt.model = i.value.ToString();
+                                    break;
+                                case "builddate":
+                                    pt.builddate = i.value.ToString();
+                                    break;
+                                case "fwversion":
+                                    pt.fwversion = i.value.ToString();
+                                    break;
+                                case "ssid":
+                                    pt.ssid = i.value.ToString();
+                                    break;
+                                case "wififrequency":
+                                    pt.wififrequency = Convert.ToInt32(i.value.ToString() );
+                                    break;
+                                case "conntimemax":
+                                    pt.conntimemax = Convert.ToInt32(i.value.ToString() );
+                                    break;
+                                case "wifitimemax":
+                                    pt.wifitimemax = Convert.ToInt32(i.value.ToString());
+                                    break;
+                                   
+                                default:
+                                    break;
 
-                            //log.LogInformation($"Comparing " + s1 + "==" + s2);
 
-                            if (String.Compare(s1, s2) == 0)
-                            {
-                                //log.LogInformation($"Ending '{i.name}'");
-                                values += $"'{i.value}'";
-
-                                //log.LogInformation($"Comparing {i.name} to wififrequency ");
-
-                                if (String.Compare($"{i.name}", $"wififrequency") == 0)
-                                {
-                                    //log.LogInformation("OLD OUTPUT");
-                                    values += $",'0','0')";
-                                }
-                                else
-                                {
-                                    values += $")";
-                                }
                             }
-                            else
-                            {
-                                //log.LogInformation($"Adding '{i.name}'");
-                                values += $"'{i.value}',";
-                            }
+
+
                         }
 
-
-                        values += $";";
+                        values += $"{pt.sleeptime},'{pt.manufacturer}','{pt.model}','{pt.builddate}','{pt.fwversion}','{pt.ssid}',{pt.wififrequency},{pt.conntimemax},{pt.wifitimemax});";
 
                         //log.LogInformation($"***VALUES*** " + values);
 
@@ -314,11 +376,11 @@ namespace Company.Function
                         {
                             connection.Open();
                             cmd2.ExecuteNonQuery();
-                            log.LogInformation("Properties Data Inserted Successfully!!!");
+                            log.LogInformation("SUCCESS!!! Properties Data Inserted Successfully!!!");
                         }
                         catch (SqlException e)
                         {
-                            log.LogError("Error!!! Details: " + e.ToString());
+                            log.LogError("***** FAILURE *****\nError!!! Details: " + e.ToString());
                         }
                         finally
                         {
@@ -326,6 +388,11 @@ namespace Company.Function
                         }
 
 
+                        /*
+                        ** TODO
+                        ** Need to add values into the device table (update values)
+                        **
+                        */
 
                     }
 
