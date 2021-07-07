@@ -22,22 +22,32 @@ namespace Company.Function
     // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse); 
     public class Telemetry
     {
-        public double azureconnecttime { get; set; }
+
         public double accelerationX { get; set; }
         public double accelerationY { get; set; }
         public double accelerationZ { get; set; }
         public double temperature { get; set; }
         public double humidity { get; set; }
+        public double avgcurrent { get; set; }
+        public double voltage { get; set; }
         public int rssi { get; set; }
         public double wififrequency_tel { get; set; }
         public double wificonnecttime { get; set; }
-        public int wififails { get; set; }
-        public int wifiresets { get; set; }
-        public int azurefails { get; set; }
-        public int fatals { get; set; }
-        public double vibration { get; set; }
-        public double avgcurrent { get; set; }
+        public double azureconnecttime { get; set; }
         public double connecttime { get; set; }
+        public int wifi_fails { get; set; }
+        public int wifi_resets { get; set; }
+        public int azure_fails { get; set; }
+        public int fatals { get; set; }
+        public int vibfails { get; set; }
+        public int tempfails { get; set; }
+        public int updatefails { get; set; }
+        public int appupdates { get; set; }
+        public int osupdates { get; set; }
+        public int updatetime { get; set; }
+
+        public int vibration { get; set; }
+
         public int appcrash { get; set; }
 
     }
@@ -97,6 +107,10 @@ namespace Company.Function
         public int wififrequency { get; set; }
         public int conntimemax { get; set; }
         public int wifitimemax { get; set; }
+        public TimeSpan samplestart { get; set; }       // SQL Datatype TIME(7)
+        public int sampleinterval { get; set; }
+        public string bssid { get; set; }
+
     }
 
     public static class VibrationEventHubTrigger
@@ -183,6 +197,7 @@ namespace Company.Function
                         log.LogInformation($"Avg Current          {vibration.telemetry.avgcurrent}");
                         log.LogInformation($"Connect Time         {vibration.telemetry.connecttime}");
                         log.LogInformation($"App Crashes          {vibration.telemetry.appcrash}");
+                        log.LogInformation($"Update Time          {vibration.telemetry.updatetime}");
                         log.LogInformation($"Msg Type             {vibration.messageProperties.type}");
                         
 
@@ -202,23 +217,26 @@ namespace Company.Function
                             $"'{vibration.telemetry.vibration}'," +
                             $"'{vibration.telemetry.wificonnecttime}'," +
                             $"'{vibration.telemetry.wififrequency_tel}'," +
+
                             $"'{vibration.telemetry.accelerationX}'," +
                             $"'{vibration.telemetry.accelerationY}'," +
                             $"'{vibration.telemetry.accelerationZ}'," +
                             $"'{vibration.telemetry.temperature}'," +
-                            $"'{vibration.telemetry.humidity}'," +
-                            $"'{vibration.telemetry.wififails}'," +
-                            $"'{vibration.telemetry.wifiresets}'," +
-                            $"'{vibration.telemetry.azurefails}'," +
+                            $"'{vibration.telemetry.wifi_fails}'," +
+                            $"'{vibration.telemetry.wifi_resets}'," +
+                            $"'{vibration.telemetry.azure_fails}'," + $"'{vibration.telemetry.humidity}'," +
                             $"'{vibration.telemetry.fatals}'," +
                             $"'{vibration.telemetry.avgcurrent}'," +
                             $"'{vibration.telemetry.connecttime}'," +
                             $"'{vibration.telemetry.appcrash}'" +
+
                             $")";
 
 
                         string query = "INSERT INTO dbo.Vibration " + " VALUES" + values;
                         SqlCommand cmd = new SqlCommand(query, connection);
+
+                        //log.LogInformation(query);
 
                         try
                         {
@@ -299,7 +317,7 @@ namespace Company.Function
                             log.LogInformation(i.name + " " + i.value);
                         }
                         *****/
-                        
+
                         string values = $"('{prop.applicationId}','{prop.messageSource}','{prop.messageType}','{prop.deviceId}','{prop.schema}','{prop.templateId}','{prop.enqueuedTime}',";
 
                         //
@@ -328,13 +346,14 @@ namespace Company.Function
 
                         foreach (var i in prop.properties)
                         {
-                             switch( i.name.ToString() ){
+                            switch (i.name.ToString())
+                            {
                                 case "sleeptime":
                                     pt.sleeptime = Convert.ToInt32(i.value.ToString());
                                     break;
                                 case "manufacturer":
                                     pt.manufacturer = i.value.ToString();
-                                    break; 
+                                    break;
                                 case "model":
                                     pt.model = i.value.ToString();
                                     break;
@@ -348,15 +367,15 @@ namespace Company.Function
                                     pt.ssid = i.value.ToString();
                                     break;
                                 case "wififrequency":
-                                    pt.wififrequency = Convert.ToInt32(i.value.ToString() );
+                                    pt.wififrequency = Convert.ToInt32(i.value.ToString());
                                     break;
                                 case "conntimemax":
-                                    pt.conntimemax = Convert.ToInt32(i.value.ToString() );
+                                    pt.conntimemax = Convert.ToInt32(i.value.ToString());
                                     break;
                                 case "wifitimemax":
                                     pt.wifitimemax = Convert.ToInt32(i.value.ToString());
                                     break;
-                                   
+
                                 default:
                                     break;
 
